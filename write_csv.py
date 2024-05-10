@@ -1,41 +1,52 @@
 import pandas as pd
 import numpy as np
-import os
+import datetime
+from dateutil.relativedelta import relativedelta
 
-df = pd.read_excel(r"C:\Users\linh.mynguyen\OneDrive - Seagroup\Linh's folder\0. Offline MKT\May 2024 Offline Budget\Shopee May'24 Budget Template (Marketing Projects).xlsx", header=25, sheet_name = "Shopee Marketing Projects")
+# Calculate month and formatted dates
+month = datetime.datetime.now() + relativedelta(months=1)
+formatted_date = month.strftime("%b'%y")
+formatted_month = month.strftime("%B")
+final_month = month.strftime("%b")
 
-new_col = ['Company','Product Code','Notelify Instantly','Add Reviewers','Members View','Attachments','Period','Category','Budget', "Remarks"]
-sort_col = ['Owner','Project Name','Company','Region','Product Code','Project Type','Start Date','End Date','Description',
-            'Notelify Instantly','Add Reviewers','Members View','Members','Attachments','Period','Category','Budget','Remarks']
+# Define sheet name and source path
+sheet_nm = "Shopee Marketing Projects"
+source = rf"C:\Users\linh.mynguyen\OneDrive - Seagroup\Linh's folder\0. Offline MKT\{formatted_date} Offline Budget\Shopee {formatted_date} Budget Template (Marketing Projects) test.xlsx"
 
-for col in new_col:
-    if col == "Company":
-        df[col] = "SPV"
-    elif col == "Product Code":
-        df[col] = "EC_SPE_COM"
-    elif col == "Notify Instantly":
-        df[col] = "N"
-    elif col == "Members View":
-        df[col] = "N"
-    elif col == "Period":
-        df[col] = "May 2024"
-    elif col == "Category":
-        df[col] = "Others"
-    elif col == "Remarks":
-        df[col] = "Basing on quotation"    
-    else:
-        df[col] = np.nan
+# Read Excel file
+df = pd.read_excel(source, header=25, sheet_name="Shopee Marketing Projects")
+df = df.dropna(subset=["Owner"])
 
-# df['Period'] = df['Period'].astype(str)
+# Define new columns and their default values
+new_col = ["Company", "Product Code", "Notify Instantly", "Add Reviewers", "Members View", "Attachments", "Period", "Category", "Budget", "Remarks"]
+sort_col = ["Owner", "Project Name", "Company", "Region", "Product Code", "Project Type", "Start Date", "End Date", "Description",
+            "Notify Instantly", "Add Reviewers", "Members View", "Members", "Attachments", "Period", "Category", "Budget", "Remarks"]
 
-df["Start Date"] = df["Start Date"].dt.strftime('%d-%b-%Y')
-df["End Date"] = df["End Date"].dt.strftime('%d-%b-%Y')
+# Add new columns with default values
+df["Company"] = "SPV"
+df["Product Code"] = "EC_SPE_COM"
+df["Notify Instantly"] = "N"
+df["Members View"] = "N"
+df["Period"] = f"{final_month} {str(month.year)}"
+df["Category"] = "Others"
+df["Remarks"] = "Basing on quotation"
+df["Notify Instantly"] = np.nan
+df["Add Reviewers"] = np.nan
+df["Attachments"] = np.nan
 
+# Handle "Budget" column based on condition
+budget_col_name = f"{formatted_month} Budget (LC)"
+if budget_col_name in df.columns:
+    df["Budget"] = np.where(df[budget_col_name] == 0, np.nan, df[budget_col_name])
+    df["Budget"] = df["Budget"].astype("Int64")
+else:
+    df["Budget"] = np.nan
+
+# Ensure columns are sorted correctly
 df = df[sort_col]
 
-old_path = r"C:\Users\linh.mynguyen\OneDrive - Seagroup\Linh's folder\0. Offline MKT\May 2024 Offline Budget\May 2024 Offline Budget.xlsx"
-new_path = r"C:\Users\linh.mynguyen\OneDrive - Seagroup\Linh's folder\0. Offline MKT\May 2024 Offline Budget\May 2024 Offline Budget.csv"
+# Define path for CSV output
+old_path = rf"C:\Users\linh.mynguyen\OneDrive - Seagroup\Linh's folder\0. Offline MKT\{formatted_date} Offline Budget\{formatted_date} Offline Budget.csv"
 
-df.to_excel(old_path, index=False, encoding='utf-8')
-
-os.rename(old_path, new_path)
+# Write DataFrame to CSV
+df.to_csv(path_or_buf=old_path, index=False)

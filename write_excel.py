@@ -30,6 +30,9 @@ def read_gsheet(formatted_date, url):
 def write_excel(sheet, start_row, start_col, file_path):
     wb = load_workbook(file_path) # use openpyxl to open workbook at specified path
     ws = wb[sheet] # choose the worksheet
+    for col in ws.column_dimensions.values(): #unhide all columns
+        col.hidden = False
+
     gsheet = read_gsheet(formatted_date, url) #call the function read_gsheet
     data = gsheet.values.tolist() #convert DataFrame to List type
     
@@ -46,5 +49,5 @@ def write_excel(sheet, start_row, start_col, file_path):
             cell.value = value # assign the cell value with 'value' above
     wb.save(new_path) # save and accept change
 
-write_excel(sheet_nm, start_row, start_col, new_path) #execute code
+write_excel(sheet_nm, start_row, start_col, new_path) # execute code
 
