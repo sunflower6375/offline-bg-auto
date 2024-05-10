@@ -12,10 +12,9 @@ formatted_month = month.strftime("%B")
 url = "https://docs.google.com/spreadsheets/d/130_NbFDUy7Mzk7sEjcyqM7nBuoEXQxCejz7zqJ77c6o/edit#gid=509276703"
 
 # destination excel file
-sheet_name = 'Shopee Marketing Projects'
+sheet_nm = 'Shopee Marketing Projects'
 start_row = 26 
 start_col = 3 
-
 new_path = rf"C:\Users\linh.mynguyen\OneDrive - Seagroup\Linh's folder\0. Offline MKT\{formatted_date} Offline Budget\Shopee {formatted_date} Budget Template (Marketing Projects).xlsx"
 
 def read_gsheet(formatted_date, url):
@@ -28,10 +27,8 @@ def read_gsheet(formatted_date, url):
     data.columns = data.iloc[0] # specify the header column
     return data
 
-# gsheet = read_gsheet(formatted_date,url) # run the first function
-
 def write_excel(sheet, start_row, start_col, file_path):
-    wb = load_workbook(new_path) # use openpyxl to open workbook at specified path
+    wb = load_workbook(file_path) # use openpyxl to open workbook at specified path
     ws = wb[sheet] # choose the worksheet
     gsheet = read_gsheet(formatted_date, url) #call the function read_gsheet
     data = gsheet.values.tolist() #convert DataFrame to List type
@@ -39,11 +36,15 @@ def write_excel(sheet, start_row, start_col, file_path):
     for row_index, row_data in enumerate(data): # loop though every row and its data
         for column_index, value in enumerate(row_data): # loop though every column in each row, also get the 'value'
             cell = ws.cell(row=start_row + row_index, column=start_col + column_index) # find the coresponding cell location, given start_row and start_col
+            if isinstance(value, str) and value.isdigit():  # check if value is a digit stored as string
+                value = int(value)  # convert to integer
+            elif isinstance(value, str):
+                try:
+                    value = float(value)  # attempt to convert to float
+                except ValueError:
+                    pass
             cell.value = value # assign the cell value with 'value' above
     wb.save(new_path) # save and accept change
 
-
-write_excel(sheet_name, start_row, start_col, new_path) #execute code
-
-
+write_excel(sheet_nm, start_row, start_col, new_path) #execute code
 
