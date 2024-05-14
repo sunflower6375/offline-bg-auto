@@ -11,7 +11,7 @@ final_month = month.strftime("%b")
 
 # Define sheet name and source path
 sheet_nm = "Shopee Marketing Projects"
-source = rf"C:\Users\linh.mynguyen\OneDrive - Seagroup\Linh's folder\0. Offline MKT\{formatted_date} Offline Budget\Shopee {formatted_date} Budget Template (Marketing Projects) test.xlsx"
+source = rf"C:\Users\linh.mynguyen\OneDrive - Seagroup\Linh's folder\0. Offline MKT\{formatted_date} Offline Budget\Shopee {formatted_date} Budget Template (Marketing Projects).xlsx"
 
 # Read Excel file
 df = pd.read_excel(source, header=25, sheet_name="Shopee Marketing Projects")
